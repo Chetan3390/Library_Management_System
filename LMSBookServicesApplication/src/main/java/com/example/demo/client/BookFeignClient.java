@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.example.demo.entity.Book;
 
-@FeignClient(url = "http://localhost:8086/books", value = "book-service")
+@FeignClient(name="book-service")
 public interface BookFeignClient {
 
 	@GetMapping("/all")

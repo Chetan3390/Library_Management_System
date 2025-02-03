@@ -17,9 +17,11 @@ public class AdminServiceImpl implements AdminService {
 
 	private final BookRepository bookRepository;
 
+    private static final String BOOK_NOT_FOUND = "Book not found";
+
 	@Override
 	public void acceptBookRequest(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
 		if (!book.isRequested()) {
 			throw new IllegalStateException("Book is not requested");
 		}
@@ -30,7 +32,7 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public void rejectBookRequest(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
 		if (!book.isRequested()) {
 			throw new IllegalStateException("Book is not requested");
 		}
@@ -60,7 +62,7 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public void deleteBook(Long bookId) {
 		if (!bookRepository.existsById(bookId)) {
-			throw new ResourceNotFoundException("Book not found");
+			throw new ResourceNotFoundException(BOOK_NOT_FOUND);
 		}
 		bookRepository.deleteById(bookId);
 
@@ -73,14 +75,14 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public void requestBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
 		book.setRequested(true);
 		bookRepository.save(book);
 	}
 
 	@Override
 	public String returnBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
 		if (!book.isAccepted()) {
 			throw new IllegalStateException("Book has not been accepted or has already been returned.");
 		}

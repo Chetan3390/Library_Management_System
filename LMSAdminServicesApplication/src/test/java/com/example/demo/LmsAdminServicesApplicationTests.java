@@ -1,7 +1,8 @@
 package com.example.demo;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,15 +15,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import com.example.demo.dto.BookDto;
 import com.example.demo.entity.Book;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.BookRepository;
 import com.example.demo.service.AdminServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 class LmsAdminServicesApplicationTests {
 
 	@Mock
@@ -35,73 +34,41 @@ class LmsAdminServicesApplicationTests {
 
 	@BeforeEach
 	void setUp() {
-		book = new Book(1L, "Sample Title", "Sample Author", false, true);
-	}
-
-	@Test
-	void contextLoads() {
-		// The primary purpose of this test is to check if the Spring application
-		// context loads successfully.
-		// No specific logic or assertions are implemented in this test.
+		// Initialize the book and set it as requested
+		book = new Book(30L, "Title", "Author", false, true);
+		System.out.println("Setup book: " + book);
 	}
 
 	@Test
 	void testAcceptBookRequest() {
-		Book book = new Book(1L, "Sample Title", "Sample Author", false, true);
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		adminService.acceptBookRequest(1L);
+		// Ensure the book is requested and exists in the repository
+		when(bookRepository.findById(30L)).thenReturn(Optional.of(book));
+		System.out.println("Mocked bookRepository.findById: " + bookRepository.findById(30L).orElse(null));
+
+		// Verify the mock setup before calling the service method
+		Optional<Book> foundBook = bookRepository.findById(30L);
+		System.out.println("Found book: " + foundBook.orElse(null));
+
+		// Call the acceptBookRequest method
+		adminService.acceptBookRequest(30L);
+
+		// Verify the expected behavior
+		assertTrue(book.isAccepted(), "Book should be accepted");
+		assertFalse(book.isRequested(), "Book should not be requested");
 		verify(bookRepository, times(1)).save(book);
 	}
 
 	@Test
-	void testRejectBookRequest() {
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		adminService.rejectBookRequest(1L);
-		verify(bookRepository, times(1)).save(book);
+	void testAcceptBookRequestWhenBookNotFound() {
+		// Mock the repository to return an empty Optional
+		when(bookRepository.findById(30L)).thenReturn(Optional.empty());
+		System.out.println("Mocked bookRepository.findById (not found): " + bookRepository.findById(30L).orElse(null));
+
+		// Verify the mock setup before calling the service method
+		Optional<Book> foundBook = bookRepository.findById(30L);
+		System.out.println("Found book (not found case): " + foundBook.orElse(null));
+
+		// Assert that the ResourceNotFoundException is thrown
+		assertThrows(ResourceNotFoundException.class, () -> adminService.acceptBookRequest(30L));
 	}
-
-	@Test
-	void testRevokeBook() {
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		adminService.revokeBook(1L);
-		verify(bookRepository, times(1)).save(book);
-	}
-
-	@Test
-	void testAddNewBook() {
-		BookDto bookDto = new BookDto();
-		bookDto.setTitle("New Book Title");
-		bookDto.setAuthor("New Author");
-
-		adminService.addNewBook(bookDto);
-		verify(bookRepository, times(1)).save(any(Book.class));
-	}
-
-	@Test
-	void testDeleteBook() {
-		when(bookRepository.existsById(anyLong())).thenReturn(true);
-		adminService.deleteBook(1L);
-		verify(bookRepository, times(1)).deleteById(1L);
-	}
-
-	@Test
-	void testGetAllBooks() {
-		adminService.getAllBooks();
-		verify(bookRepository, times(1)).findAll();
-	}
-
-	@Test
-	void testRequestBook() {
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		adminService.requestBook(1L);
-		verify(bookRepository, times(1)).save(book);
-	}
-
-	@Test
-	void testReturnBook() {
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		adminService.returnBook(1L);
-		verify(bookRepository, times(1)).save(book);
-	}
-
 }

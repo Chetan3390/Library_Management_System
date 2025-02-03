@@ -5,9 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.client.AdminFeignClient;
-import com.example.demo.client.BookFeignClient;
 import com.example.demo.entity.Book;
-import com.example.demo.repository.BookRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
-	private final BookFeignClient bookFeignClient;
 	private final AdminFeignClient adminFeignClient;
-	private final BookRepository bookRepository;
 
 	@Override
 	public List<Book> getRequestedBooks() {

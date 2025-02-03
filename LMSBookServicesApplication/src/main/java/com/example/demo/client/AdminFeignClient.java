@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import com.example.demo.entity.Book;
 
-@FeignClient(name = "admin-service", url = "http://localhost:8085/admin")
+@FeignClient(name = "admin-service")
 public interface AdminFeignClient {
 
 	@PutMapping("/request/{bookId}")
