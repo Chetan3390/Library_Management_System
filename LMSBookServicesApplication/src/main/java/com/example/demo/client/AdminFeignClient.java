@@ -13,22 +13,22 @@ import com.example.demo.entity.Book;
 @FeignClient(name = "admin-service")
 public interface AdminFeignClient {
 
-	@PutMapping("/request/{bookId}")
+	@PutMapping("/admin/request/{bookId}")
 	void requestBook(@PathVariable Long bookId);
 
-	@PostMapping("/accept/{bookId}")
+	@PostMapping("/admin/accept/{bookId}")
 	void acceptBookRequest(@PathVariable Long bookId);
 
-	@PostMapping("/reject/{bookId}")
+	@PostMapping("/admin/reject/{bookId}")
 	void rejectBookRequest(@PathVariable Long bookId);
 
-	@PostMapping("/revoke/{bookId}")
+	@PostMapping("/admin/revoke/{bookId}")
 	void revokeBook(@PathVariable Long bookId);
 	
-	@PutMapping("/return/{bookId}")
+	@PutMapping("/admin/return/{bookId}")
     String returnBook(@PathVariable Long bookId);
 
-	@GetMapping("/books")
+	@GetMapping("/admin/books")
 	List<Book> getAllBooks();
 
 
