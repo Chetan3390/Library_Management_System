@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-@ControllerAdvice
+@ControllerAdvice // Global exception handler for the application
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)

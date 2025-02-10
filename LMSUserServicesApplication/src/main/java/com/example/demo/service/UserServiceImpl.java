@@ -1,10 +1,15 @@
 package com.example.demo.service;
 
+import java.util.Objects;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.User;
+import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.UserRepository;
 
@@ -14,29 +19,31 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+	@Autowired
 	private UserRepository userRepository;
 
-	private BCryptPasswordEncoder passwordEncoder;
-
+	
 	@Override
-	public User register(UserDto userDto) {
+	public User register(User user) {
 
-		User user = new User();
-		user.setUserName(userDto.getUserName());
-		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-		user.setRole("USER");
 		return userRepository.save(user);
 	}
 
 	@Override
-	public String login(String username, String password) {
-
-		User user = userRepository.findByUserName(username)
-				.orElseThrow(() -> new ResourceNotFoundException("Invalid username or password"));
-		if (!passwordEncoder.matches(password, user.getPassword())) {
-			throw new ResourceNotFoundException("Invalid username or password");
+	public String loginUser(UserDto user) throws InvalidCredentialsException {
+		Optional<User> foundUser = userRepository.findByUserName(user.getUserName());
+		
+		if(!foundUser.isPresent()) {
+			throw new ResourceNotFoundException("User Not found!!");
 		}
-		return "Login successful";
+		
+		User existingUser = foundUser.get();
+		
+		if(!Objects.equals(user.getPassword(), existingUser.getPassword())) {
+			throw new InvalidCredentialsException("Password is Incorrect!!");
+		}
+		
+		return "User Logged In Successfully!!";
 	}
 
 }
