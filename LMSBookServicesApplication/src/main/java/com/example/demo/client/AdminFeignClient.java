@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.demo.entity.Book;
 
@@ -14,29 +15,33 @@ import com.example.demo.entity.Book;
 @FeignClient(name = "admin-service")
 public interface AdminFeignClient {
 
-    // Endpoint to request a book
-	@PutMapping("/admin/request/{bookId}")
-	void requestBook(@PathVariable Long bookId);
+	@GetMapping("/admin/book/{id}")
+	Book getBookById(@PathVariable Long id);
 
-    // Endpoint to accept a book request
-	@PostMapping("/admin/accept/{bookId}")
-	void acceptBookRequest(@PathVariable Long bookId);
+	@GetMapping("/admin/books/requested")
+	List<Book> getRequestedBooks();
 
-    // Endpoint to reject a book request
-	@PostMapping("/admin/reject/{bookId}")
-	void rejectBookRequest(@PathVariable Long bookId);
+	@GetMapping("/admin/books/accepted")
+	List<Book> getAcceptedBooks();
 
-    // Endpoint to revoke a book
-	@PostMapping("/admin/revoke/{bookId}")
-	void revokeBook(@PathVariable Long bookId);
-	
-    // Endpoint to return a book
-	@PutMapping("/admin/return/{bookId}")
-    String returnBook(@PathVariable Long bookId);
-
-    // Endpoint to get all books
 	@GetMapping("/admin/books")
 	List<Book> getAllBooks();
 
+//	@PutMapping("/admin/update")
+//	void updateBook(@RequestBody Book book);
 
+	@PutMapping("/admin/request/{bookId}/{userId}")
+	void requestBook(@PathVariable Long bookId, @PathVariable int userId);
+
+	@PostMapping("/admin/accept/{bookId}/{userId}")
+	void acceptBookRequest(@PathVariable Long bookId, @PathVariable int userId);
+
+	@PostMapping("/admin/reject/{bookId}/{userId}")
+	void rejectBookRequest(@PathVariable Long bookId, @PathVariable int userId);
+
+	@PostMapping("/admin/revoke/{bookId}/{userId}")
+	void revokeBook(@PathVariable Long bookId, @PathVariable int userId);
+
+	@PutMapping("/admin/return/{bookId}/{userId}")
+	String returnBook(@PathVariable Long bookId, int userId);
 }

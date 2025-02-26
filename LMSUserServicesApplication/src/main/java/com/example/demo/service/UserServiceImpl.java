@@ -3,8 +3,6 @@ package com.example.demo.service;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.UserDto;
@@ -13,13 +11,12 @@ import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	@Autowired
 	private UserRepository userRepository;
 
 	
@@ -30,7 +27,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String loginUser(UserDto user) throws InvalidCredentialsException {
+	public String loginUser(UserDto user) throws InvalidCredentialsException, ResourceNotFoundException {
 		Optional<User> foundUser = userRepository.findByUserName(user.getUserName());
 		
 		if(!foundUser.isPresent()) {

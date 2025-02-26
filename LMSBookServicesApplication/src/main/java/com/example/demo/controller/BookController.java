@@ -12,47 +12,53 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.Book;
 import com.example.demo.service.BookService;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/books")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class BookController {
 
 	private final BookService bookService;
 
-    // Endpoint to get all requested books
-	@GetMapping("/requested")
-	public ResponseEntity<List<Book>> getRequestedBooks() {
-		List<Book> books = bookService.getRequestedBooks();
-		return ResponseEntity.ok(books);
-	}
+	@GetMapping("/requested/{userId}")
+    public ResponseEntity<List<Book>> getRequestedBooks(@PathVariable int userId) {
+        List<Book> books = bookService.getRequestedBooks(userId);
+        return ResponseEntity.ok(books);
+    }
 
-    // Endpoint to get all accepted books
-	@GetMapping("/accepted")
-	public ResponseEntity<List<Book>> getAcceptedBooks() {
-		List<Book> books = bookService.getAcceptedBooks();
-		return ResponseEntity.ok(books);
-	}
+    @GetMapping("/accepted/{userId}")
+    public ResponseEntity<List<Book>> getAcceptedBooks(@PathVariable int userId) {
+        List<Book> books = bookService.getAcceptedBooks(userId);
+        return ResponseEntity.ok(books);
+    }
 
-    // Endpoint to request a book
-	@PutMapping("/request/{bookId}")
-	public ResponseEntity<String> requestBook(@PathVariable Long bookId) {
-		bookService.requestBook(bookId);
-		return ResponseEntity.ok("Book requested successfully");
-	}
+    @GetMapping("/requested")
+    public ResponseEntity<List<Book>> getAllRequestedBooks() {
+        List<Book> books = bookService.getRequestedBooks();
+        return ResponseEntity.ok(books);
+    }
 
-    // Endpoint to return a book
-	@PutMapping("/return/{bookId}")
-	public String returnBook(@PathVariable Long bookId) {
-		return bookService.returnBook(bookId);
-	}
+    @GetMapping("/accepted")
+    public ResponseEntity<List<Book>> getAllAcceptedBooks() {
+        List<Book> books = bookService.getAcceptedBooks();
+        return ResponseEntity.ok(books);
+    }
 
-    // Endpoint to get all books
-	@GetMapping("/all")
-	public ResponseEntity<List<Book>> getAllBooks() {
-		List<Book> books = bookService.getAllBooks();
-		return ResponseEntity.ok(books);
-	}
+    @GetMapping("/all")
+    public ResponseEntity<List<Book>> getAllBooks() {
+        List<Book> books = bookService.getAllBooks();
+        return ResponseEntity.ok(books);
+    }
 
+    @PutMapping("/request/{bookId}/{userId}")
+    public ResponseEntity<String> requestBook(@PathVariable Long bookId, @PathVariable int userId) {
+        bookService.requestBook(bookId, userId);
+        return ResponseEntity.ok("Book requested successfully");
+    }
+
+    @PutMapping("/return/{bookId}/{userId}")
+    public ResponseEntity<String> returnBook(@PathVariable Long bookId, @PathVariable int userId) {
+    	 return ResponseEntity.ok(bookService.returnBook(bookId, userId));
+    }
 }

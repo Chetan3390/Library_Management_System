@@ -17,68 +17,92 @@ import com.example.demo.entity.Book;
 import com.example.demo.service.AdminService;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/admin")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AdminController {
 
 	// Dependency Injection of AdminService
 	private final AdminService adminService;
 
-    // Endpoint to accept a book request
-	@PostMapping("/accept/{bookId}")
-	public ResponseEntity<String> acceptBookRequest(@PathVariable Long bookId) {
-		adminService.acceptBookRequest(bookId);
-		return ResponseEntity.ok("Book request accepted successfully");
+	// Endpoint to accept a book request
+	@PostMapping("/accept/{bookId}/{userId}")
+	public ResponseEntity<String> acceptBookRequest(@PathVariable Long bookId, @PathVariable int userId) {
+		adminService.acceptBookRequest(bookId, userId);
+		return ResponseEntity.ok("Book request accepted successfully for user " + userId);
 	}
 
 	// Endpoint to reject a book request
-	@PostMapping("/reject/{bookId}")
-	public ResponseEntity<String> rejectBookRequest(@PathVariable Long bookId) {
-		adminService.rejectBookRequest(bookId);
-		return ResponseEntity.ok("Book request rejected successfully");
+	@PostMapping("/reject/{bookId}/{userId}")
+	public ResponseEntity<String> rejectBookRequest(@PathVariable Long bookId, @PathVariable int userId) {
+		adminService.rejectBookRequest(bookId, userId);
+		return ResponseEntity.ok("Book request rejected successfully for user " + userId);
 	}
 
 	// Endpoint to revoke a book
-	@PostMapping("/revoke/{bookId}")
-	public ResponseEntity<String> revokeBook(@PathVariable Long bookId) {
-		adminService.revokeBook(bookId);
-		return ResponseEntity.ok("Book revoked successfully");
+	@PostMapping("/revoke/{bookId}/{userId}")
+	public ResponseEntity<String> revokeBook(@PathVariable Long bookId, @PathVariable int userId) {
+		adminService.revokeBook(bookId, userId);
+		return ResponseEntity.ok("Book revoked successfully for user " + userId);
 	}
 
-    // Endpoint to add a new book
+	// Endpoint to add a new book
 	@PostMapping("/add")
 	public ResponseEntity<String> addNewBook(@Valid @RequestBody BookDto bookDto) {
 		adminService.addNewBook(bookDto);
 		return ResponseEntity.ok("New book added successfully");
 	}
 
-    // Endpoint to delete a book
+	// Endpoint to delete a book
 	@DeleteMapping("/delete/{bookId}")
 	public ResponseEntity<String> deleteBook(@PathVariable Long bookId) {
 		adminService.deleteBook(bookId);
 		return ResponseEntity.ok("Book deleted successfully");
 	}
 
-    // Endpoint to get all books
+	// Endpoint to get all books
 	@GetMapping("/books")
 	public ResponseEntity<List<Book>> getAllBooks() {
 		List<Book> books = adminService.getAllBooks();
 		return ResponseEntity.ok(books);
 	}
-	
-    // Endpoint to return a book (invoked by BookService)	
-	@PutMapping("/return/{bookId}")
-	public String returnBook(@PathVariable Long bookId) {
-		return adminService.returnBook(bookId);
+
+	// Endpoint to return a book (invoked by BookService)
+	@PutMapping("/return/{bookId}/{userId}")
+	public String returnBook(@PathVariable Long bookId, @PathVariable int userId) {
+		return adminService.returnBook(bookId, userId);
+	}
+
+	// Endpoint to request a book
+	@PutMapping("/request/{bookId}/{userId}")
+	public void requestBook(@PathVariable Long bookId, @PathVariable int userId) {
+		adminService.requestBook(bookId, userId);
 	}
 	
-    // Endpoint to request a book
-	@PutMapping("/request/{bookId}")
-	public void requestBook(@PathVariable Long bookId) {
-		adminService.requestBook(bookId);
-	}
-	
+	@GetMapping("/book/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        Book book = adminService.getBookById(id);
+        return ResponseEntity.ok(book);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Void> updateBook(@RequestBody Book book) {
+        adminService.updateBook(book);
+        return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/books/requested")
+    public ResponseEntity<List<Book>> getRequestedBooks() {
+        List<Book> books = adminService.getRequestedBooks();
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/books/accepted")
+    public ResponseEntity<List<Book>> getAcceptedBooks() {
+        List<Book> books = adminService.getAcceptedBooks();
+        return ResponseEntity.ok(books);
+    }
+
 }

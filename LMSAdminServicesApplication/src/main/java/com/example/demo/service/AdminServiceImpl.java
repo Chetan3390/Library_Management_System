@@ -17,13 +17,13 @@ public class AdminServiceImpl implements AdminService {
 
 	private final BookRepository bookRepository;
 
-    private static final String BOOK_NOT_FOUND = "Book not found";
+	private static final String BOOK_NOT_FOUND = "Book not found";
 
 	@Override
-	public void acceptBookRequest(Long bookId) {
+	public void acceptBookRequest(Long bookId, int userId) {
 		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
-		if (!book.isRequested()) {
-			throw new IllegalStateException("Book is not requested");
+		if (!book.isRequested() || book.getUserId() != userId) {
+			throw new IllegalStateException("Book is not requested by this user");
 		}
 		book.setAccepted(true);
 		book.setRequested(false);
@@ -31,21 +31,27 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void rejectBookRequest(Long bookId) {
+	public void rejectBookRequest(Long bookId, int userId) {
 		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
-		if (!book.isRequested()) {
-			throw new IllegalStateException("Book is not requested");
+		if (!book.isRequested() || book.getUserId() != userId) {
+			throw new IllegalStateException("Book is not requested by this user");
 		}
 		book.setRequested(false);
+		book.setUserId(0);
 		bookRepository.save(book);
 	}
 
 	@Override
-	public void revokeBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(
-				() -> new ResourceNotFoundException("Book not found or cannot revoke a book which is not accepted"));
-		book.setAccepted(false);
-		bookRepository.save(book);
+    public void revokeBook(Long bookId, int userId) {
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found or cannot revoke a book which is not accepted"));
+        if (book.getUserId() != userId) {
+            throw new IllegalStateException("Book is not accepted by this user");
+        }
+        book.setAccepted(false);
+        book.setRequested(false);
+        book.setUserId(0); // Reset userId
+        bookRepository.save(book);
 	}
 
 	@Override
@@ -74,22 +80,56 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void requestBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
-		book.setRequested(true);
+    public void requestBook(Long bookId, int userId) {
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+
+        // Check if the book is already requested
+        if (book.isRequested()) {
+            // Handle the case where the book is already requested
+            throw new IllegalStateException("Book is already requested by another user");
+        }
+
+        // Set the requested status and userId
+        else {
+        book.setRequested(true);
+        book.setUserId(userId);
+        bookRepository.save(book);
+	}
+	}
+
+	@Override
+	public String returnBook(Long bookId, int userId) {
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalStateException("Book not found"));
+		if (book.isRequested() && book.getUserId() == userId) {
+			book.setAccepted(false);
+			book.setRequested(false);
+			book.setUserId(0); // Reset userId
+			bookRepository.save(book); // Update book
+			return "Book returned successfully";
+		} else {
+			throw new IllegalStateException("Book is not currently borrowed by this user");
+		}
+	}
+
+	@Override
+	public Book getBookById(Long id) {
+		return bookRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
+	}
+
+	@Override
+	public void updateBook(Book book) {
 		bookRepository.save(book);
 	}
 
 	@Override
-	public String returnBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException(BOOK_NOT_FOUND));
-		if (!book.isAccepted()) {
-			throw new IllegalStateException("Book has not been accepted or has already been returned.");
-		}
-		book.setAccepted(false);
-		book.setRequested(false);
-		bookRepository.save(book);
-		return "Book returned successfully";
+	public List<Book> getRequestedBooks() {
+		return bookRepository.findAll().stream().filter(Book::isRequested).toList();
+	}
+
+	@Override
+	public List<Book> getAcceptedBooks() {
+		return bookRepository.findAll().stream().filter(Book::isAccepted).toList();
 	}
 
 }

@@ -24,7 +24,7 @@ public class LoggingAdvice {
  
     ObjectMapper mapper = new ObjectMapper().registerModule(new Jdk8Module());
  
-    @Pointcut(value = "execution(* com.example.demo.*.*.*(..))")
+    @Pointcut(value = "execution(* com.example.demo.*.*(..))")
     public void myPointcut() {
     }
  

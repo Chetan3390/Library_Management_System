@@ -22,4 +22,6 @@ public class Book {
 	private boolean accepted;
 
 	private boolean requested;
+	
+    private int userId; 
 }
