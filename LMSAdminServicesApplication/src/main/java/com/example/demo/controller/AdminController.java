@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.client.UserFeignClient;
 import com.example.demo.dto.BookDto;
 import com.example.demo.entity.Book;
+import com.example.demo.entity.User;
 import com.example.demo.service.AdminService;
 
 import jakarta.validation.Valid;
@@ -26,6 +28,8 @@ public class AdminController {
 
 	// Dependency Injection of AdminService
 	private final AdminService adminService;
+	
+	private UserFeignClient userFeignClient;
 
 	// Endpoint to accept a book request
 	@PostMapping("/accept/{bookId}/{userId}")
@@ -103,6 +107,16 @@ public class AdminController {
     public ResponseEntity<List<Book>> getAcceptedBooks() {
         List<Book> books = adminService.getAcceptedBooks();
         return ResponseEntity.ok(books);
+    }
+    
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            List<User> users = userFeignClient.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error fetching user details: " + e.getMessage());
+        }
     }
 
 }

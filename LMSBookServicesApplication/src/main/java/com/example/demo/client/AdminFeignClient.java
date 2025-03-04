@@ -27,9 +27,6 @@ public interface AdminFeignClient {
 	@GetMapping("/admin/books")
 	List<Book> getAllBooks();
 
-//	@PutMapping("/admin/update")
-//	void updateBook(@RequestBody Book book);
-
 	@PutMapping("/admin/request/{bookId}/{userId}")
 	void requestBook(@PathVariable Long bookId, @PathVariable int userId);
 
@@ -43,5 +40,5 @@ public interface AdminFeignClient {
 	void revokeBook(@PathVariable Long bookId, @PathVariable int userId);
 
 	@PutMapping("/admin/return/{bookId}/{userId}")
-	String returnBook(@PathVariable Long bookId, int userId);
+	String returnBook(@PathVariable Long bookId,@PathVariable int userId);
 }

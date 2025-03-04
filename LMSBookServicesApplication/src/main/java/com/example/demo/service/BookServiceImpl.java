@@ -49,7 +49,6 @@ public class BookServiceImpl implements BookService {
     public void requestBook(Long bookId, int userId) {
         Book book = adminFeignClient.getBookById(bookId);
         adminFeignClient.requestBook(bookId, userId);
-//        adminFeignClient.updateBook(book);
     }
 
     @Override

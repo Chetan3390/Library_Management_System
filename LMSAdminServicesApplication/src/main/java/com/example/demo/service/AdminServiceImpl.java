@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminServiceImpl implements AdminService {
 
 	private final BookRepository bookRepository;
+//	 private final UserFeignClient userFeignClient;
 
 	private static final String BOOK_NOT_FOUND = "Book not found";
 
@@ -100,8 +101,8 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public String returnBook(Long bookId, int userId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalStateException("Book not found"));
-		if (book.isRequested() && book.getUserId() == userId) {
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalStateException(BOOK_NOT_FOUND));
+		if (book.isAccepted() && book.getUserId() == userId) {
 			book.setAccepted(false);
 			book.setRequested(false);
 			book.setUserId(0); // Reset userId
